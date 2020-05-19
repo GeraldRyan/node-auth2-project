@@ -3,19 +3,19 @@ const router = require('express').Router()
 const Users = require('./user-model')
 // const db = require('../data/dbconfig')
 
-function restricted(req, res, next)
-{
-  if (req.session && req.session.loggedIn)
-  {
-    next()
-  }
-  else
-  {
-    res.status(400).json({ you: "cannot pass" })
-  }
-}
+// function restricted(req, res, next)
+// {
+//   if (req.session && req.session.loggedIn)
+//   {
+//     next()
+//   }
+//   else
+//   {
+//     res.status(400).json({ you: "cannot pass" })
+//   }
+// }
 
-router.use(restricted)
+// router.use(restricted)
 
 router.get('/', (req, res) =>
 {
@@ -23,7 +23,7 @@ router.get('/', (req, res) =>
     // db('users').select('id', 'username').orderBy('id')
     .then(users =>
     {
-      res.json(users)
+      res.status(200).json({users, jwt:req.jwt})
     })
     .catch(err =>
     {

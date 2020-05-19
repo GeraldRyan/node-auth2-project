@@ -4,12 +4,14 @@ const helmet = require("helmet")
 const userRouter = require('./users/user-router.js')
 const authRouter = require('./auth/router.js')
 const session = require('express-session')
+const restrict = require('./auth/restricted-middleware')
 
 const db = require("./data/dbconfig.js")
 
 const server = express()
 
 server.use(helmet())
+// server.use(restrict)
 server.use(express.json())
 sessionConfig = {
   cookie:{
@@ -29,7 +31,7 @@ server.get("/",(req,res)=>{
   res.status(201).json("server running")
 })
 
-server.use('/api/users', userRouter)
+server.use('/api/users', restrict, userRouter)
 server.use('/api/auth', authRouter)
 
 

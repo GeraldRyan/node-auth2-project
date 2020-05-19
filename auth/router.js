@@ -1,7 +1,9 @@
 const router = require('express').Router()
 const bcryptjs = require('bcryptjs')
+const jwt = require("jsonwebtoken")
 const Users = require('../users/user-model.js')
 const { isValid } = require('../users/user-service')
+const configVars = require("../config/vars")
 
 router.post('/register', (req, res) =>
 {
@@ -34,22 +36,21 @@ router.post('/login', (req, res) =>
 
   if (isValid(req.body))
   {
-
-
     Users.findBy({ username: username }).then(([user]) =>
     {
       if (user && bcryptjs.compareSync(password, user.password))
       {
         // create session
-        req.session.loggedIn = true
-        req.session.user = user
+        // req.session.loggedIn = true
+        // req.session.user = user
 
+      const token = createToken(user)
 
-        res.status(200).json("Welcome to our API")
+        res.status(200).json(`welcome to our API. Token= ${token}`)
       }
       else
       {
-        res.status(401).json({ message: "invalid credentials. You shall not pass" })
+        res.status(401).json({ message: "invalid credentials. You shall not pass", token, user })
       }
     }).catch(err =>
     {
@@ -83,4 +84,17 @@ router.get('/logout', (req, res) =>{
 
   }
 })
+
+function createToken(user){
+  const payload={
+    sub:user.id,
+    username:user.username,
+    department:user.department
+  }
+  const options = {
+    expiresIn: '1d'
+  }
+
+  return jwt.sign(payload, configVars.jwtSecret, options)
+}
 module.exports = router
